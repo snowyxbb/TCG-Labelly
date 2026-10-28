@@ -13,5 +13,5 @@ jobs:
       # setup-uv publishes no floating major tag; pin the exact release
       - uses: astral-sh/setup-uv@v10.3.3
       - run: uv sync
-      # smoke check: deps resolve and the app imports
-      - run: uv run python -c "import main; assert main.app"
+      - run: uvx ruff check .
+      - run: uv run pytest
