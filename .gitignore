@@ -2,3 +2,13 @@
 __pycache__/
 *.pyc
 .env
+
+# Teach skill workspace — learning material stays out of the repo
+/MISSION.md
+/RESOURCES.md
+/NOTES.md
+/learning-records/
+/lessons/
+/assets/
+/reference/
+/GLOSSARY.md
