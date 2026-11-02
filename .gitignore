@@ -2,6 +2,11 @@
 __pycache__/
 *.pyc
 .env
+.pytest_cache/
+.ruff_cache/
+
+# Local SQLite database
+*.db
 
 # Teach skill workspace — learning material stays out of the repo
 /MISSION.md
