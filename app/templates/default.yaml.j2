@@ -1,0 +1,78 @@
+# ==============================================================
+#  TCG-Labelly label template -- worked example + tutorial
+# ==============================================================
+#
+#  WHAT THIS FILE IS
+#    A recipe for printing labels. You describe the label once,
+#    and the app fills in your product data -- one label per
+#    product. Lines starting with # are comments: the app ignores
+#    them, they are just for you.
+#
+#  THE ONLY TWO TEMPLATE THINGS YOU NEED (Jinja2 basics)
+{% raw %}
+#    1) {{ p.name }}  means "put the product's name here".
+#       Whatever sits between {{ and }} is replaced by real data
+#       when the label is printed. `p` means "the current product".
+#
+#    2) {% for p in products %} ... {% endfor %} means "repeat the
+#       block in between once per product".
+{% endraw %}
+#
+#  GOLDEN RULE
+{% raw %}
+#    After any {{ ... }} that holds text, keep the little `| y`
+#    that follows it, e.g. {{ p.name | y }}. It makes special
+#    characters (colons, quotes, emojis) safe. Removing it can
+#    break the whole file.
+{% endraw %}
+#
+#  ------------------------------------------------------------
+#  MAKE YOUR OWN TEMPLATE -- 3 STEPS
+#    1. Download this file:         GET /labels/template
+#    2. Edit it (field list below)
+#    3. Upload it as a NEW template (the raw file is the body):
+#         POST /label-templates/file?name=My+Template
+#       ...or replace an existing one:
+#         PUT /label-templates/{id}/file
+#    The app checks the file on upload and rejects it with a
+#    clear error message if it is broken.
+#  ------------------------------------------------------------
+#
+#  FIELDS YOU CAN USE (each written as a placeholder with | y)
+{% raw %}
+#    p.name            product name, e.g. "Lightning Bolt"
+#    p.set_name        set it belongs to, e.g. "Double Masters"
+#    p.sku             short stock code, e.g. "2XM-123"
+#    p.currency        currency code, e.g. "SGD"
+#    p.price           normal price, e.g. 10.0
+#    p.original_price  the "was" price, shown struck through
+#    p.on_sale         true or false -- discounted right now?
+#    p.discount        discount percent (0-100), used when on_sale
+#    p.qr              QR payload (e.g. product_uid); null = no QR
+#    p.barcode         barcode payload (e.g. full_sku); null = none
+{% endraw %}
+#
+#  TIPS
+#    - Delete a line to remove that thing from the label.
+#    - Keep the 2-space indentation exactly as shown.
+#    - `null` means "leave it out" (no QR, no barcode, ...).
+#    - width_mm / height_mm below = your physical label stock.
+#      Measure your sticker roll and set them to match.
+
+page:
+  width_mm: 60
+  height_mm: 40
+  padding_mm: 3       # space between content and sticker edge
+labels:
+{% for p in products %}
+  - name: {{ p.name | y }}
+    set_name: {{ p.set_name | y }}
+    sku: {{ p.sku | y }}
+    currency: {{ p.currency | y }}
+    price: {{ p.price | y }}
+    original_price: {{ p.original_price | y }}
+    on_sale: {{ p.on_sale | y }}
+    discount: {{ p.discount | y }}
+    qr: {{ p.qr | y }}            # null = no QR on the label
+    barcode: {{ p.barcode | y }}  # null = no barcode on the label
+{% endfor %}

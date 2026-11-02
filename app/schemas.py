@@ -1,6 +1,6 @@
-"""Request schemas for Product. Table models are never accepted directly from
-clients — these validate input first (direct table-model construction skips
-Pydantic validation, so the schema is the trust boundary)."""
+"""Request schemas. Table models are never accepted directly from clients —
+these validate input first (direct table-model construction skips Pydantic
+validation, so the schema is the trust boundary)."""
 
 from sqlmodel import Field, SQLModel
 
@@ -50,3 +50,17 @@ class SaleUpdate(SQLModel):
     on_sale: bool | None = None
     discount: float | None = Field(default=None, ge=0, le=100)
     quantity: int | None = Field(default=None, ge=0)
+
+
+class LabelTemplateCreate(SQLModel):
+    name: str = Field(min_length=1)
+    template: str = Field(min_length=1)
+    description: str = ""
+
+
+class LabelTemplateUpdate(SQLModel):
+    """All fields optional; only provided fields are applied (PATCH)."""
+
+    name: str | None = Field(default=None, min_length=1)
+    template: str | None = Field(default=None, min_length=1)
+    description: str | None = None

@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from sqlmodel import Field, Index, SQLModel
 
 
@@ -24,3 +26,14 @@ class Product(SQLModel, table=True):
 
     # serves the most common combined filter: set + language
     __table_args__ = (Index("ix_product_set_language", "set_name", "language"),)
+
+
+class LabelTemplate(SQLModel, table=True):
+    """A saved label-sheet template: YAML layout with Jinja2 placeholders."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(index=True, unique=True)
+    template: str
+    description: str = ""
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
