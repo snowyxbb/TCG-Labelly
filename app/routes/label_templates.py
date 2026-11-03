@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import or_, select
 
 from app.database import SessionDep
-from app.labels import LabelTemplateError, validate_template
+from app.labels import LabelTemplateError, _safe_filename, validate_template
 from app.models import LabelTemplate
 from app.schemas import LabelTemplateCreate, LabelTemplateUpdate
 
@@ -88,11 +88,6 @@ def get_template(template_id: int, session: SessionDep) -> LabelTemplate:
     if row is None:
         raise HTTPException(status_code=404, detail="Template not found")
     return row
-
-
-def _safe_filename(name: str) -> str:
-    clean = "".join(c if c.isascii() and (c.isalnum() or c in "-_") else "_" for c in name)
-    return (clean or "template") + ".yaml"
 
 
 @router.get("/{template_id}/file")

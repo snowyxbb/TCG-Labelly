@@ -64,3 +64,18 @@ class LabelTemplateUpdate(SQLModel):
     name: str | None = Field(default=None, min_length=1)
     template: str | None = Field(default=None, min_length=1)
     description: str | None = None
+
+
+class InlineProduct(ProductCreate):
+    """Product data sent straight to POST /labels/pdf (no DB row)."""
+
+    qr: str | None = None
+    barcode: str | None = None
+
+
+class LabelPdfRequest(SQLModel):
+    """Body for POST /labels/pdf: inline products + which template to use."""
+
+    products: list[InlineProduct] = Field(min_length=1)
+    template: str | None = None
+    template_id: int | None = None

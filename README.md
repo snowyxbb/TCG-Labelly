@@ -4,7 +4,9 @@ Label maker for trading card games. FastAPI backend; generates printable label s
 
 ## Status
 
-Products API is live: CRUD, search (`/products/search?q=`), sale/discount toggling — backed by SQLite via SQLModel. PDF label generation is not built yet.
+Products API is live: CRUD, search (`/products/search?q=`), sale/discount toggling — backed by SQLite via SQLModel.
+
+PDF label generation is live: `GET /labels/pdf?ids=1,2&template_id=3` (products from the DB, one page per unit of quantity) and `POST /labels/pdf` (inline products + `template` XOR `template_id`, default template when neither). Templates are YAML+Jinja2 with an optional `layout:` section (element positions in mm from the top-left, nested field lists join on one line) — see the tutorial at `GET /labels/template`.
 
 ## Develop
 

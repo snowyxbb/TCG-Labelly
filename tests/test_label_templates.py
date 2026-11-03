@@ -1,14 +1,21 @@
+def _template_text(width_mm: int = 60) -> str:
+    """A minimal template that satisfies the label-sheet contract."""
+    return (
+        "page:\n"
+        f"  width_mm: {width_mm}\n"
+        "  height_mm: 40\n"
+        "labels:\n"
+        "{% for p in products %}\n"
+        "  - name: {{ p.name | y }}\n"
+        "    price: {{ p.price | y }}\n"
+        "{% endfor %}"
+    )
+
+
 def _payload(**overrides):
     data = {
         "name": "A4 two-column",
-        "template": (
-            "sheet:\n"
-            "  columns: 2\n"
-            "labels:\n"
-            "{% for p in products %}\n"
-            "  - name: {{ p.name | y }}\n"
-            "{% endfor %}"
-        ),
+        "template": _template_text(),
         "description": "standard sheet",
     }
     data.update(overrides)
@@ -24,7 +31,7 @@ def test_create_and_get_template(client):
 
     r = client.get("/label-templates/1")
     assert r.status_code == 200
-    assert r.json()["template"].startswith("sheet:")
+    assert r.json()["template"].startswith("page:")
 
 
 def test_list_templates(client):
@@ -37,7 +44,7 @@ def test_list_templates(client):
 
 def test_create_rejects_duplicate_name(client):
     client.post("/label-templates", json=_payload())
-    r = client.post("/label-templates", json=_payload(template="x: 1"))
+    r = client.post("/label-templates", json=_payload(template=_template_text(50)))
     assert r.status_code == 409
 
 
@@ -54,11 +61,11 @@ def test_create_rejects_blank_fields(client):
 def test_patch_updates_template_and_timestamp(client):
     client.post("/label-templates", json=_payload())
     created = client.get("/label-templates/1").json()
-    r = client.patch("/label-templates/1", json={"template": "labels: []", "name": "renamed"})
+    r = client.patch("/label-templates/1", json={"template": _template_text(50), "name": "renamed"})
     assert r.status_code == 200
     body = r.json()
     assert body["name"] == "renamed"
-    assert body["template"] == "labels: []"
+    assert body["template"] == _template_text(50)
     assert body["updated_at"] >= created["updated_at"]
 
 
@@ -106,7 +113,7 @@ def test_download_template_file(client):
     client.post("/label-templates", json=_payload())
     r = client.get("/label-templates/1/file")
     assert r.status_code == 200
-    assert r.text.startswith("sheet:")
+    assert r.text.startswith("page:")
     assert r.headers["content-type"] == "application/x-yaml"
     assert "attachment" in r.headers["content-disposition"]
     assert "A4_two-column.yaml" in r.headers["content-disposition"]
@@ -115,7 +122,7 @@ def test_download_template_file(client):
 def test_file_roundtrip(client):
     client.post("/label-templates", json=_payload())
     original = client.get("/label-templates/1/file").text
-    edited = original.replace("columns: 2", "columns: 3")
+    edited = original.replace("width_mm: 60", "width_mm: 50")
     r = client.put(
         "/label-templates/1/file", content=edited.encode(), headers={"Content-Type": "text/yaml"}
     )

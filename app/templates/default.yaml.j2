@@ -43,6 +43,7 @@
 #    p.name            product name, e.g. "Lightning Bolt"
 #    p.set_name        set it belongs to, e.g. "Double Masters"
 #    p.sku             short stock code, e.g. "2XM-123"
+#    p.variant         variant text, e.g. "Collector Booster" (often empty)
 #    p.currency        currency code, e.g. "SGD"
 #    p.price           normal price, e.g. 10.0
 #    p.original_price  the "was" price, shown struck through
@@ -63,6 +64,31 @@ page:
   width_mm: 60
   height_mm: 40
   padding_mm: 3       # space between content and sticker edge
+
+#  ------------------------------------------------------------
+#  WHERE THINGS GO (optional -- delete this whole `layout:`
+#  section to use the defaults: text top-left, QR bottom-right,
+#  barcode bottom-left).
+#
+#    * Coordinates are millimetres from the TOP-LEFT corner.
+#    * A plain field name prints on its own line.
+#    * Wrap field names in [ ] to print them on ONE line, joined
+#      left to right with text_separator. Any number of fields
+#      works; empty values are skipped automatically.
+#    * The layout is per sheet, not per label -- it sits here,
+#      outside the for-loop below.
+#  ------------------------------------------------------------
+layout:
+  text_fields:
+    - name
+    - set_name
+    - [sku, variant]    # one line: "2XM-123 Collector Booster"
+    - price
+  text_separator: " "               # what goes between joined fields
+  text_origin: {x_mm: 3, y_mm: 3}   # top-left of the first text line
+  font_pt: 8
+  qr: {x_mm: 41, y_mm: 21, size_mm: 16}       # bottom-right corner
+  barcode: {x_mm: 3, y_mm: 29, height_mm: 8}  # bottom-left corner
 labels:
 {% for p in products %}
   - name: {{ p.name | y }}
